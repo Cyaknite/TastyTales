@@ -1,0 +1,43 @@
+.navbar.navbar-expand-lg.bg-body-tertiary {
+  margin: 0;
+  padding: 0;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.container-fluid.Navbar{
+  padding: 10px;
+  background-color: rgba(0, 0, 0, 0.901);
+}
+
+.navbar-brand {
+  color: darkorange;
+  font-weight: 900;
+}
+
+.navbar-toggler-icon {
+  background-image: url("../assets/burger.png");
+  width: 24px;
+  height: 24px;
+  border-radius: 5px;
+}
+.navbar-toggler{
+    border:2px solid orange
+}
+.navbar-toggler:focus {
+  outline: 2px solid orange !important; /* Change to a custom color */
+  box-shadow: 0 0 5px rgba(255, 165, 0, 0.5) !important; /* Soft glow */
+}
+
+.navbar .nav-link,
+.navbar-brand {
+  color: darkorange; /* Keeps text orange always */
+  font-weight: 900;
+}
+
+.navbar .nav-link:hover,
+.navbar-brand:hover {
+  color: orange; /* Slightly darker orange on hover */
+}
+

@@ -1,0 +1,10 @@
+.loader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 4px; /* Adjust thickness */
+  background-color: orange;
+  width: 100%;
+  transform-origin: left;
+  z-index: 9999;
+}
