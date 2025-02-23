@@ -11,7 +11,7 @@ const Login = () => {
     if(loginCred.email==""||loginCred.password==""){
       alert("Please fill all fields")
     }else{
-      
+      localStorage.setItem("loginStatus","loggedIn");
     }
 
   }

@@ -20,7 +20,7 @@ const Navbar = () => {
           <motion.button
             whileTap={{
               rotate: 45,
-              scale:0.8
+              scale: 0.8,
             }}
             className="navbar-toggler bg-orange"
             type="button"
@@ -79,36 +79,48 @@ const Navbar = () => {
                   Register
                 </MotionLink>
               </li>
-              <li className="nav-item">
-                <MotionLink
-                  whileHover={{
-                    scale: 1.1,
-                    transformOrigin: "center",
-                  }}
-                  style={{
-                    display: "inline-block",
-                  }}
-                  className="nav-link"
-                  to="/Dashboard"
-                >
-                  Dashboard
-                </MotionLink>
-              </li>
-              <li className="nav-item">
-                <MotionLink
-                  whileHover={{
-                    scale: 1.1,
-                    transformOrigin: "center",
-                  }}
-                  style={{
-                    display: "inline-block",
-                  }}
-                  className="nav-link"
-                  to="/Logout"
-                >
-                  Logout
-                </MotionLink>
-              </li>
+              {localStorage.getItem("loginStatus")? (
+                <>
+                  <li className="nav-item">
+                    <MotionLink
+                      whileHover={{
+                        scale: 1.1,
+                        transformOrigin: "center",
+                      }}
+                      style={{
+                        display: "inline-block",
+                      }}
+                      className="nav-link"
+                      to="/Dashboard"
+                    >
+                      Dashboard
+                    </MotionLink>
+                  </li>
+                </>
+              ) : (
+                <></>
+              )}
+              {localStorage.getItem("loginStatus")? (
+                <>
+                  <li className="nav-item">
+                    <MotionLink
+                      whileHover={{
+                        scale: 1.1,
+                        transformOrigin: "center",
+                      }}
+                      style={{
+                        display: "inline-block",
+                      }}
+                      className="nav-link"
+                      to="/Logout"
+                    >
+                      Logout
+                    </MotionLink>
+                  </li>
+                </>
+              ) : (
+                <></>
+              )}
             </ul>
           </div>
         </div>
