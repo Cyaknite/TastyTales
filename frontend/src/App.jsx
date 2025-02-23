@@ -5,6 +5,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import Logout from "./pages/Logout";
+import Admin from "./pages/Admin";
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
           <Route path="/Register" element={<Register></Register>}></Route>
           <Route path="/Dashboard" element={<Dashboard></Dashboard>}></Route>
           <Route path="/Logout" element={<Logout></Logout>}></Route>
+          <Route path="/Admin" element={<Admin></Admin>}></Route>
         </Routes>
       </Router>
     </>
