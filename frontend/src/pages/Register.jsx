@@ -8,9 +8,11 @@ const Register = () => {
     password: "",
   });
   const [repass, setRepass] = useState("");
+  const [reg, setReg] = useState("");
+
   const navigate = useNavigate();
-  function handleSubmit(e) {
-   
+  async function handleSubmit(e) {
+    e.preventDefault();
     if (
       registerCred.username == "" ||
       registerCred.email == "" ||
@@ -18,14 +20,38 @@ const Register = () => {
       repass == ""
     ) {
       alert("Please enter all fields");
+      return;
     }
-    if(registerCred.password==repass){
-      alert("success")
+    if (registerCred.password != repass) {
+      alert("Password and Retyped password should be same");
+      return;
+    }
+    try {
+      let res = await fetch("http://localhost:8080/Register", {
+        method: "post",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(registerCred),
+      });
+      let data = await res.json();
+      if (res.status == 201) {
+        setReg(data.msg);
+        setTimeout(() => {
+          navigate("/Login");
+        }, 3000);
+        return;
+      }
+      alert(data.msg);
+    } catch (err) {
+      console.error("Error:", err);
+      alert("Something went wrong. Please try again");
     }
   }
   return (
     <>
       <Navbar></Navbar>
+
       <div className="container-fluid Login d-flex justify-content-center align-items-center">
         <div className="row ">
           <div
@@ -36,6 +62,13 @@ const Register = () => {
           >
             <form className="card Login">
               <h2 className="text-center">Register</h2>
+              {reg != "" ? (
+                <>
+                  <p>{reg+" redirecting shortly"}</p>
+                </>
+              ) : (
+                <></>
+              )}
               <div className="mb-3">
                 <label htmlFor="username" className="form-label">
                   Enter Username

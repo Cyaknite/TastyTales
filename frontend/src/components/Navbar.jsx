@@ -3,7 +3,7 @@ import { motion } from "motion/react";
 import { Link } from "react-router-dom";
 import "./Navbar.css";
 import ScrollProgress from "./ScrollProgress";
-const MotionLink = motion(Link);
+const MotionLink = motion.create(Link);
 const Navbar = () => {
   return (
     <>
