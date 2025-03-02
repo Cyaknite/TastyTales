@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-const RecipeCard = ({ recipe, onDelete, onSave }) => {
+const RecipeCardDashboard = ({ recipe,onSave }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [user, setUser] = useState(null);
   const [forceUpdate, setForceUpdate] = useState(false); // Force re-render
@@ -11,44 +11,6 @@ const RecipeCard = ({ recipe, onDelete, onSave }) => {
     setUser(userData);
   }, [forceUpdate]); // Re-run effect when forceUpdate changes
 
-  const handleDelete = async (recipeId) => {
-    try {
-      const response = await fetch("http://localhost:8080/delete-recipe", {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: localStorage.getItem("Authorization"),
-          "Access-Control-Allow-Origin": "no-cors",
-        },
-        body: JSON.stringify({ recipeId }), // Send the recipe ID
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        alert(result.msg); // Show success message
-        onDelete(recipeId);
-
-        // Update the local user state
-        const updatedUser = { ...user };
-        if (updatedUser.savedRecipes.includes(recipeId)) {
-          // If the recipe is already saved, remove it
-          updatedUser.savedRecipes = updatedUser.savedRecipes.filter(
-            (id) => id !== recipeId
-          );
-        }
-
-        // Update the user state and localStorage
-        setUser(updatedUser);
-        localStorage.setItem("user", JSON.stringify(updatedUser));
-        setForceUpdate((prev) => !prev); // Force re-render
-      } else {
-        alert("Failed to delete recipe.");
-      }
-    } catch (err) {
-      console.error("Error deleting recipe:", err);
-      alert("An error occurred while deleting the recipe.");
-    }
-  };
 
   const handleSave = async (recipeId) => {
     try {
@@ -216,14 +178,6 @@ const RecipeCard = ({ recipe, onDelete, onSave }) => {
                   : "Save"}
               </button>
 
-              {user && user._id === recipe.author && (
-                <button
-                  className="btn btn-outline-danger"
-                  onClick={() => handleDelete(recipe._id)}
-                >
-                  <i className="bi bi-trash"></i> Delete
-                </button>
-              )}
             </div>
           </div>
         )}
@@ -232,4 +186,4 @@ const RecipeCard = ({ recipe, onDelete, onSave }) => {
   );
 };
 
-export default RecipeCard;
+export default RecipeCardDashboard;

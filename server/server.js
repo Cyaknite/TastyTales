@@ -50,7 +50,6 @@ app.post("/Register", async (req, res) => {
     const user = await User.create(registerCred);
     const result = await user.save();
     console.log("User registered successfully");
-    console.log(result);
     res.status(201).json({ msg: "Registeration successful" });
   } catch (err) {
     console.log("An error occured!:", err);
@@ -95,7 +94,6 @@ app.post("/Login", async (req, res) => {
       JWT_PASS,
       { expiresIn: "2d" }
     );
-    console.log("Login Successfull");
     res.status(200).json(token);
   } catch (err) {
     console.error("An error occured!:", err);
@@ -110,7 +108,12 @@ app.post("/Profile", token_verify, async (req, res) => {
     let data = await User.findOne({
       username: { $eq: req.user.username },
     }).lean();
-    console.log(data);
+
+    if (!data) {
+      return res.status(404).json({
+        msg: "User not found",
+      });
+    }
     let savedRecipes = [];
     for (i of data.savedRecipes) {
       const savedRecipe = await Recipe.findById(i);
@@ -149,8 +152,6 @@ app.post("/Profile", token_verify, async (req, res) => {
       data.profilePicture = null; // Set to null if no profile picture exists
     }
 
-    console.log(createdRecipes);
-    console.log(savedRecipes);
     data.password = null;
     res.status(200).json({ data, savedRecipes, createdRecipes });
   } catch (err) {
@@ -280,7 +281,6 @@ app.post(
 
       user.createdRecipes.push(savedRecipe._id);
       await user.save();
-      console.log(newRecipe);
       res.json({ msg: "Recipe added successfully!", recipe: savedRecipe });
     } catch (err) {
       console.error(err);
@@ -289,43 +289,68 @@ app.post(
   }
 );
 
-app.patch(
-  "/update-profile",
-  token_verify,
-  upload.single("profilePicture"),
-  async (req, res) => {
-    try {
-      const { password, bio, profilePicture } = req.body;
-      let user = await User.findOne({ username: { $eq: req.user.username } });
-      if (!user) {
-        return res.status(404).json({
-          msg: "User not found",
-        });
-      }
-      if (password) {
-        const hashedPassword = await bcrypt.hash(password, 3);
-        user.password = hashedPassword;
-      }
-      user.bio = bio || user.bio;
+app.patch("/update-profile", token_verify, async (req, res) => {
+  try {
+    console.log(req.body);
 
-      if (req.file) {
-        user.profilePicture = {
-          data: req.file.buffer,
-          contentType: req.file.mimetype,
-        };
-      }
-      await user.save();
-      res.status(200).json({
-        msg: "Profile updated Successfully",
-      });
-    } catch (err) {
-      console.error("Error updating profile:", err);
-      res.status(500).json({
-        msg: "Server error",
+    const { password, bio } = req.body;
+    let user = await User.findOne({ username: { $eq: req.user.username } });
+    if (!user) {
+      return res.status(404).json({
+        msg: "User not found",
       });
     }
+    if (password) {
+      const hashedPassword = await bcrypt.hash(password, 3);
+      user.password = hashedPassword;
+    }
+
+    if (bio) {
+      user.bio;
+    }
+    user.profilePicture = {
+      data: req.file.buffer,
+      contentType: req.file.mimetype,
+    };
+    user.updatedAt = new Date();
+    let result = await user.save();
+    console.log(result);
+    res.status(200).json({
+      msg: "Profile updated Successfully",
+    });
+  } catch (err) {
+    console.error("Error updating profile:", err);
+    res.status(500).json({
+      msg: "Server error",
+    });
   }
-);
+});
+
+app.get("/dashboard", token_verify, async (req, res) => {
+  try {
+    let data = await Recipe.find();
+
+    // Modify each recipe to include the Base64 image URL
+    const formattedData = data.map((recipe) => {
+      if (recipe.image && recipe.image.data) {
+        const base64Image = recipe.image.data.toString("base64");
+        const imageUrl = `data:${recipe.image.contentType};base64,${base64Image}`;
+        return {
+          ...recipe._doc, // Spread the rest of the recipe data
+          image: imageUrl, // Replace the image object with the Base64 URL
+        };
+      }
+      return recipe; // If no image data is present, return the recipe as-is
+    });
+
+    res.status(200).json(formattedData); // Send the formatted data
+  } catch (err) {
+    console.error("An error occurred!", err);
+    res.status(500).json({
+      msg: "Internal Server error",
+    });
+  }
+});
 
 app.all("*", (req, res) => {
   res.status(404).json({
