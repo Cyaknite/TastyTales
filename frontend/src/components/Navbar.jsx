@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { motion } from "motion/react";
 import { Link } from "react-router-dom";
 import "./Navbar.css";
 import ScrollProgress from "./ScrollProgress";
+
 const MotionLink = motion.create(Link);
 const Navbar = () => {
   return (
@@ -49,37 +50,49 @@ const Navbar = () => {
                   Home
                 </MotionLink>
               </li>
-              <li className="nav-item">
-                <MotionLink
-                  whileHover={{
-                    scale: 1.1,
-                    transformOrigin: "center",
-                  }}
-                  style={{
-                    display: "inline-block",
-                  }}
-                  className="nav-link"
-                  to="/Login"
-                >
-                  Login
-                </MotionLink>
-              </li>
-              <li className="nav-item">
-                <MotionLink
-                  whileHover={{
-                    scale: 1.1,
-                    transformOrigin: "center",
-                  }}
-                  style={{
-                    display: "inline-block",
-                  }}
-                  className="nav-link"
-                  to="/Register"
-                >
-                  Register
-                </MotionLink>
-              </li>
-              {localStorage.getItem("loginStatus")? (
+              {localStorage.getItem("loginStatus") != "true" ? (
+                <>
+                  <li className="nav-item">
+                    <MotionLink
+                      whileHover={{
+                        scale: 1.1,
+                        transformOrigin: "center",
+                      }}
+                      style={{
+                        display: "inline-block",
+                      }}
+                      className="nav-link"
+                      to="/Login"
+                    >
+                      Login
+                    </MotionLink>
+                  </li>
+                </>
+              ) : (
+                <></>
+              )}
+              {localStorage.getItem("loginStatus") != "true" ? (
+                <>
+                  <li className="nav-item">
+                    <MotionLink
+                      whileHover={{
+                        scale: 1.1,
+                        transformOrigin: "center",
+                      }}
+                      style={{
+                        display: "inline-block",
+                      }}
+                      className="nav-link"
+                      to="/Register"
+                    >
+                      Register
+                    </MotionLink>
+                  </li>
+                </>
+              ) : (
+                <></>
+              )}
+              {localStorage.getItem("loginStatus") ? (
                 <>
                   <li className="nav-item">
                     <MotionLink
@@ -100,7 +113,7 @@ const Navbar = () => {
               ) : (
                 <></>
               )}
-              {localStorage.getItem("loginStatus")? (
+              {localStorage.getItem("loginStatus") ? (
                 <>
                   <li className="nav-item">
                     <MotionLink
@@ -115,6 +128,48 @@ const Navbar = () => {
                       to="/Logout"
                     >
                       Logout
+                    </MotionLink>
+                  </li>
+                </>
+              ) : (
+                <></>
+              )}
+              {localStorage.getItem("loginStatus") ? (
+                <>
+                  <li className="nav-item">
+                    <MotionLink
+                      whileHover={{
+                        scale: 1.1,
+                        transformOrigin: "center",
+                      }}
+                      style={{
+                        display: "inline-block",
+                      }}
+                      className="nav-link"
+                      to="/Profile"
+                    >
+                      Profile
+                    </MotionLink>
+                  </li>
+                </>
+              ) : (
+                <></>
+              )}
+              {localStorage.getItem("loginStatus") ? (
+                <>
+                  <li className="nav-item">
+                    <MotionLink
+                      whileHover={{
+                        scale: 1.1,
+                        transformOrigin: "center",
+                      }}
+                      style={{
+                        display: "inline-block",
+                      }}
+                      className="nav-link"
+                      to="/Create-Recipe"
+                    >
+                      Create Recipe
                     </MotionLink>
                   </li>
                 </>

@@ -3,17 +3,34 @@ import Navbar from "../components/Navbar";
 import { Link, useNavigate } from "react-router-dom";
 import "./Login.css";
 const Login = () => {
-
-  const navigate=useNavigate();
+  let res;
+  const navigate = useNavigate();
   const [loginCred, setLoginCred] = useState({ email: "", password: "" });
-  function handleSubmit(e) {
-    
-    if(loginCred.email==""||loginCred.password==""){
-      alert("Please fill all fields")
-    }else{
-      localStorage.setItem("loginStatus","loggedIn");
+  async function handleSubmit(e) {
+    e.preventDefault();
+    if (loginCred.email == "" || loginCred.password == "") {
+      alert("Please fill all fields");
+      return;
     }
 
+    res = await fetch("http://localhost:8080/Login", {
+      method: "post",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(loginCred),
+    });
+    let data = await res.json();
+    if (res.status == 200) {
+      localStorage.setItem("Authorization", data);
+      localStorage.setItem("loginStatus", "true");
+      setTimeout(() => {
+        navigate("/Dashboard");
+      }, 2000);
+      return;
+    } else {
+      localStorage.clear();
+    }
   }
   return (
     <>
@@ -28,6 +45,13 @@ const Login = () => {
           >
             <form className="card Login">
               <h2 className="text-center">Login</h2>
+              {res?.status == 200 ? (
+                <>
+                  <p>Login Successful redirecting shortly</p>
+                </>
+              ) : (
+                <>{res?.msg}</>
+              )}
               <div className="mb-3">
                 <label htmlFor="exampleInputEmail1" className="form-label">
                   Email address
