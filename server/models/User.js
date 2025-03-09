@@ -18,7 +18,7 @@ const UserSchema = new mongoose.Schema({
     required: true,
   },
   profilePicture: {
-    type: Buffer, 
+    data: Buffer, 
     contentType:String,
   },
   bio: {

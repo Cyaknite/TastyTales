@@ -3,6 +3,7 @@ import Navbar from "../components/Navbar";
 import { motion } from "framer-motion"; // Corrected import
 import { useNavigate } from "react-router-dom";
 import RecipeCard from "../components/RecipeCard";
+import axios from "axios";
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -45,6 +46,7 @@ const Profile = () => {
           return;
         }
         let result = await response.json();
+        
         setUser(result.data);
         localStorage.setItem("user", JSON.stringify(result.data));
         setCreatedRecipes(result.createdRecipes);
@@ -90,24 +92,21 @@ const Profile = () => {
 
   // Handle form submission
   const handleSubmit = async (e) => {
-    e.preventDefault();
 
+    const finalData = new FormData();
+    finalData.append("profilePicture", formData.profilePicture);
+    finalData.append("password", formData.password);
+    finalData.append("bio", formData.bio);
     try {
-      const formDataToSend = new FormData();
-      formDataToSend.append("password", formData.password);
-      formDataToSend.append("bio", formData.bio);
-      if (formData.profilePicture) {
-        formDataToSend.append("profilePicture", formData.profilePicture);
-      }
-      console.log(formData);
-      const response = await fetch("http://localhost:8080/update-profile", {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: localStorage.getItem("Authorization"),
-        },
-        body: JSON.stringify(formData),
-      });
+      const response = await axios.patch(
+        "http://localhost:8080/update-profile",
+        finalData,
+        {
+          headers: {
+            Authorization: localStorage.getItem("Authorization"),
+          },
+        }
+      );
 
       if (response.ok) {
         const result = await response.json();
@@ -124,6 +123,7 @@ const Profile = () => {
         const updatedResult = await updatedResponse.json();
         setUser(updatedResult.data);
         localStorage.setItem("user", JSON.stringify(updatedResult.data));
+
       } else {
         alert("Failed to update profile.");
       }
@@ -158,29 +158,29 @@ const Profile = () => {
             {user.createdRecipes ? <>{user.createdRecipes.length}</> : <>0</>}
             <p>Created Recipes</p>
           </div>
-          {/* <div className="col">
+          <div className="col">
             {user.followers ? <>{user.followers.length}</> : <>0</>}
             <p>Followers</p>
           </div>
           <div className="col">
             {user.following ? <>{user.following.length}</> : <>0</>}
             <p>Following</p>
-          </div> */}
+          </div>
         </div>
-        {/* <div className="row">
+        <div className="row">
           <div className="col">
             <h3>Bio</h3>
             <p>{user.bio ? <>{user.bio}</> : <>Edit bio</>}</p>
           </div>
-        </div> */}
+        </div>
         <div className="row">
           <div className="col">
-           {/*  <button
+            <button
               className="btn btn-outline-primary"
               onClick={() => setShowEditForm(true)} // Open the edit form
             >
               Edit Profile
-            </button> */}
+            </button>
             <button
               className="btn btn-outline-primary m-1"
               onClick={() => setShowSaved(!showSaved)}
@@ -236,7 +236,7 @@ const Profile = () => {
                 ></button>
               </div>
               <div className="modal-body">
-                <form onSubmit={handleSubmit} enctype="multipart/form-data">
+                <form onSubmit={handleSubmit} encType="multipart/form-data">
                   {/* Password */}
                   <div className="mb-3">
                     <label className="form-label">New Password</label>

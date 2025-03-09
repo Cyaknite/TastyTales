@@ -18,7 +18,13 @@ const upload = multer({ storage: storage });
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 
 mongoose
   .connect(process.env.MONGO_URL)
@@ -28,6 +34,8 @@ mongoose
   .catch((err) => {
     console.error("An error occured!:", err);
   });
+
+app.options("*", cors());
 
 app.post("/Register", async (req, res) => {
   try {
@@ -289,42 +297,46 @@ app.post(
   }
 );
 
-app.patch("/update-profile", token_verify, async (req, res) => {
-  try {
-    console.log(req.body);
+app.patch(
+  "/update-profile",
+  token_verify,
+  upload.single("profilePicture"),
+  async (req, res) => {
+    try {
+      const { password, bio } = req.body;
+      let user = await User.findOne({ username: { $eq: req.user.username } });
+      if (!user) {
+        return res.status(404).json({
+          msg: "User not found",
+        });
+      }
+      if (password) {
+        const hashedPassword = await bcrypt.hash(password, 3);
+        user.password = hashedPassword;
+      }
 
-    const { password, bio } = req.body;
-    let user = await User.findOne({ username: { $eq: req.user.username } });
-    if (!user) {
-      return res.status(404).json({
-        msg: "User not found",
+      if (bio) {
+        user.bio = bio;
+      }
+
+      if (req.file) {
+        user.profilePicture = {
+          data: req.file.buffer,
+          contentType: req.file.mimetype,
+        };
+      }
+      await user.save();
+      res.status(200).json({
+        msg: "Profile updated Successfully",
+      });
+    } catch (err) {
+      console.error("Error updating profile:", err);
+      res.status(500).json({
+        msg: "Server error",
       });
     }
-    if (password) {
-      const hashedPassword = await bcrypt.hash(password, 3);
-      user.password = hashedPassword;
-    }
-
-    if (bio) {
-      user.bio;
-    }
-    user.profilePicture = {
-      data: req.file.buffer,
-      contentType: req.file.mimetype,
-    };
-    user.updatedAt = new Date();
-    let result = await user.save();
-    console.log(result);
-    res.status(200).json({
-      msg: "Profile updated Successfully",
-    });
-  } catch (err) {
-    console.error("Error updating profile:", err);
-    res.status(500).json({
-      msg: "Server error",
-    });
   }
-});
+);
 
 app.get("/dashboard", token_verify, async (req, res) => {
   try {
@@ -346,6 +358,31 @@ app.get("/dashboard", token_verify, async (req, res) => {
     res.status(200).json(formattedData); // Send the formatted data
   } catch (err) {
     console.error("An error occurred!", err);
+    res.status(500).json({
+      msg: "Internal Server error",
+    });
+  }
+});
+
+app.get("/search", token_verify, async (req, res) => {
+  try {
+    let query = req.query.query.trim();
+    let data = await Recipe.find({ title: { $eq: query } });
+
+    const formattedData = data.map((recipe) => {
+      if (recipe.image && recipe.image.data) {
+        const base64Image = recipe.image.data.toString("base64");
+        const imageUrl = `data:${recipe.image.contentType};base64,${base64Image}`;
+        return {
+          ...recipe._doc, // Spread the rest of the recipe data
+          image: imageUrl, // Replace the image object with the Base64 URL
+        };
+      }
+      return recipe; // If no image data is present, return the recipe as-is
+    });
+    res.status(200).json(formattedData); // Send the formatted data
+  } catch (err) {
+    console.error("An error occured!:", err.message);
     res.status(500).json({
       msg: "Internal Server error",
     });
