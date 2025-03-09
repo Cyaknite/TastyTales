@@ -158,14 +158,14 @@ const Profile = () => {
             {user.createdRecipes ? <>{user.createdRecipes.length}</> : <>0</>}
             <p>Created Recipes</p>
           </div>
-          <div className="col">
+          {/* <div className="col">
             {user.followers ? <>{user.followers.length}</> : <>0</>}
             <p>Followers</p>
-          </div>
-          <div className="col">
+          </div> */}
+          {/* <div className="col">
             {user.following ? <>{user.following.length}</> : <>0</>}
             <p>Following</p>
-          </div>
+          </div> */}
         </div>
         <div className="row">
           <div className="col">
